@@ -1,0 +1,58 @@
+---
+- name: Setup Docker and Deploy Todo App
+  hosts: todo_servers
+  become: true
+
+  tasks:
+    - name: Update apt
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Enable and start Docker
+      systemd:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Install pip
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+
+    - name: Create app directory
+      file:
+        path: /opt/todo-app
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker-compose.yml
+      copy:
+        src: ../docker-compose.yml
+        dest: /opt/todo-app/docker-compose.yml
+        mode: '0644'
+
+    - name: Copy .env file
+      copy:
+        src: ../.env
+        dest: /opt/todo-app/.env
+        mode: '0600'
+
+    - name: Run Docker Compose up
+      command: docker-compose up -d
+      args:
+        chdir: /opt/todo-app 
