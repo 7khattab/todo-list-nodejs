@@ -32,7 +32,7 @@ This project demonstrates a complete DevOps workflow including:
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 
 - Docker and Docker Compose
 - Ansible (for VM configuration)
 
@@ -41,26 +41,17 @@ This project demonstrates a complete DevOps workflow including:
 ### Local Development
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/todo-list-nodejs.git
-   cd todo-list-nodejs
-   ```
+
 
 2. Create a `.env` file:
-   ```bash
-   # MongoDB Connection String
-   mongoDbUrl=mongodb://localhost:27017/todo-list
+  
+
 
    # Application Configuration
-   PORT=4000
-   NODE_ENV=development
-   ```
+
 
 3. Install dependencies and start:
-   ```bash
-   npm install
-   npm start
-   ```
+
 
 The application will be available at `http://localhost:4000`
 
@@ -78,7 +69,7 @@ The application is containerized using a multi-stage Dockerfile with the followi
 
 The CI/CD pipeline automatically:
 - Builds Docker images on push to main/master branch
-- Pushes images to GitHub Container Registry (ghcr.io)
+- Pushes images to DockerHub
 - Supports multiple tags (branch, PR, SHA, latest)
 
 **Workflow File**: `.github/workflows/ci-cd.yml`
