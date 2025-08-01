@@ -1,18 +1,28 @@
 ---
 - name: Setup Docker and Deploy Todo App
-  hosts: todo_servers
+  hosts: worker1
+  vars_files: secrets.yml
   become: true
 
   tasks:
-    - name: Update apt
-      apt:
-        update_cache: yes
+    - name: Update package manager cache (for RHEL-based systems)
+      yum:
+        name: "*"
+        state: latest
 
-    - name: Install Docker
-      apt:
-        name: docker.io
+    - name: Install Docker packages
+      yum:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
         state: present
 
+    - name: Create docker group if it doesn't exist
+      group:
+        name: docker
+        state: present
+    
     - name: Add user to docker group
       user:
         name: "{{ ansible_user }}"
@@ -25,12 +35,12 @@
         enabled: true
         state: started
 
-    - name: Install pip
-      apt:
+    - name: Install pip3
+      yum:
         name: python3-pip
         state: present
 
-    - name: Install Docker Compose
+    - name: Install Docker Compose using pip
       pip:
         name: docker-compose
 
@@ -42,17 +52,17 @@
 
     - name: Copy docker-compose.yml
       copy:
-        src: ../docker-compose.yml
+        src: docker-compose.yml
         dest: /opt/todo-app/docker-compose.yml
         mode: '0644'
 
     - name: Copy .env file
       copy:
-        src: ../.env
+        src: .env
         dest: /opt/todo-app/.env
         mode: '0600'
 
     - name: Run Docker Compose up
-      command: docker-compose up -d
+      command: docker compose up -d
       args:
-        chdir: /opt/todo-app 
+        chdir: /opt/todo-app
